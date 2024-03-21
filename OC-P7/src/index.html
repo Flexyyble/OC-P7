@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anton:wght@400;600;700&family=Manrope:wght@400;600;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+      integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link href="../dist/output.css" rel="stylesheet" />
+    <title>Les petits plats</title>
+  </head>
+  <body>
+    <header>
+      <!-- Logo -->
+      <div class="absolute p-5">
+        <img src="assets/img/logo.svg" alt="Logo Les petits plats" />
+      </div>
+
+      <!-- Hero -->
+      <div
+        class="flex h-[40rem] w-full items-center justify-center bg-[url('../src/assets/img/hero.png')] bg-cover bg-center bg-no-repeat"
+      >
+        <div class="text-center">
+          <h1
+            class="h- mx-auto mb-8 w-[55rem] font-anton text-5xl uppercase text-[#FFD15B]"
+          >
+            Cherchez parmi plus de 1500 recettes du quotidien, simples et
+            délicieuses
+          </h1>
+          <nav class="relative">
+            <input
+              type="text"
+              id="search-input"
+              name="search"
+              placeholder="Rechercher une recette, un ingrédient, ..."
+              class="w-full rounded-xl p-6"
+            />
+            <button
+              type="submit"
+              id="search-button"
+              class="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-black p-3"
+            >
+              <img
+                src="assets/icons/magnifying_glass.svg"
+                alt="Icone de recherche"
+              />
+            </button>
+          </nav>
+        </div>
+      </div>
+    </header>
+    <main class="relative min-h-[400px] bg-[#EDEDED] px-24 pb-32">
+      <div id="skeleton-container">
+        <div class="flex gap-16 py-6">
+          <div
+            class="relative h-14 w-48 animate-pulse rounded-md bg-gray-400 p-4"
+          ></div>
+          <div
+            class="relative h-14 w-48 animate-pulse rounded-md bg-gray-400 p-4"
+          ></div>
+          <div
+            class="relative h-14 w-48 animate-pulse rounded-md bg-gray-400 p-4"
+          ></div>
+        </div>
+        <div class="grid grid-cols-3 gap-12">
+          <div
+            class="h-[45rem] w-96 animate-pulse rounded-md bg-gray-400"
+          ></div>
+          <div
+            class="h-[45rem] w-96 animate-pulse rounded-md bg-gray-400"
+          ></div>
+          <div
+            class="h-[45rem] w-96 animate-pulse rounded-md bg-gray-400"
+          ></div>
+          <div
+            class="h-[45rem] w-96 animate-pulse rounded-md bg-gray-400"
+          ></div>
+          <div
+            class="h-[45rem] w-96 animate-pulse rounded-md bg-gray-400"
+          ></div>
+          <div
+            class="h-[45rem] w-96 animate-pulse rounded-md bg-gray-400"
+          ></div>
+        </div>
+      </div>
+      <div id="main-container" class="hidden">
+        <section
+          id="recipes-infos"
+          class="center flex items-center justify-between"
+        >
+          <div id="dropdowns-container" class="my-6 flex gap-16"></div>
+          <div id="total-recipes"></div>
+        </section>
+        <section id="tags-container" class="flex gap-8"></section>
+        <section id="cards-container" class="grid grid-cols-3 gap-12"></section>
+      </div>
+    </main>
+    <script type="module" src="./script/main.js" defer></script>
+  </body>
+</html>
