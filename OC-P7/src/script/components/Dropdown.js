@@ -127,31 +127,18 @@ export class Dropdown {
   // handle option click event
   handleOptionClick(option) {
     option.addEventListener('click', async () => {
-      const optionText = option.innerText;
-      const searchKeywords = optionText.toLowerCase().split(' ');
+      if (this._selectedOptions.includes(option.innerText)) return;
 
-      searchKeywords.forEach(keyword => {
-        if (!this._selectedOptions.includes(keyword)) {
-          this._selectedOptions.push(keyword);
-
-          // Recherche de variations de mots-clés
-          const keywordVariations = generateKeywordVariations(keyword);
-          keywordVariations.forEach(variation => {
-            if (!this._selectedOptions.includes(variation)) {
-              this._selectedOptions.push(variation);
-            }
-          });
-        }
-      });
+      this._selectedOptions.push(option.innerText);
+      console.log(option.innerText);
 
       const optionClicked = createEl('li', {
         class: 'p-[0.81rem] text-sm bg-[#FFD15B] font-bold flex justify-between items-center',
         dataset: {
-          dropdownOptionClicked: optionText,
+          dropdownOptionClicked: option.innerText,
         },
-        innerText: optionText
-      });
-
+        innerText: option.innerText
+      })
       option.style.display = 'none';
       const $closeIcon = createEl('i', {
         class: 'fas fa-circle-xmark cursor-pointer ',
@@ -167,88 +154,74 @@ export class Dropdown {
     });
   }
 
-  generateKeywordVariations(keyword) {
-    // Générer des variations de mots-clés en ajoutant des suffixes ou des préfixes courants
-    const variations = [];
-    // Ajouter des variations spécifiques selon vos besoins
-    // Par exemple, pour "Banane", ajouter "Bananes", "banane", etc.
-    // Vous pouvez étendre cette fonction pour inclure plus de variations
-    variations.push(keyword); // Ajouter le mot-clé original
-    variations.push(keyword.toLowerCase()); // Ajouter en minuscules
-    variations.push(keyword.toUpperCase()); // Ajouter en majuscules
-    // Ajouter d'autres variations pertinentes selon vos besoins
+  handleOptionCloseIconClick(option, optionClicked) {
+    optionClicked.addEventListener('click', (e) => e.stopPropagation());
+    this._selectedOptions = this._selectedOptions.filter((selectedOption) => selectedOption !== option.innerText);
+    optionClicked.remove()
+    option.style.display = 'block';
 
-    return variations;
+    const $tag = document.querySelector(`[data-tag="${option.innerText}"]`)
+    if (!$tag) return;
+    new Tags().closeTags($tag)
+
+    this.renderTagsAndCards();
   }
 
-    handleOptionCloseIconClick(option, optionClicked) {
-      optionClicked.addEventListener('click', (e) => e.stopPropagation());
-      this._selectedOptions = this._selectedOptions.filter((selectedOption) => selectedOption !== option.innerText);
-      optionClicked.remove()
-      option.style.display = 'block';
+  handleTagRemoved(tagOption) {
+    this._selectedOptions = this._selectedOptions.filter((selectedOption) => selectedOption !== tagOption);
 
-      const $tag = document.querySelector(`[data-tag="${option.innerText}"]`)
-      if (!$tag) return;
-      new Tags().closeTags($tag)
+    const $optionClicked = document.querySelector(`[data-dropdown-option-clicked="${tagOption}"]`);
+    if (!$optionClicked) return;
+    $optionClicked.remove();
 
-      this.renderTagsAndCards();
-    }
+    const $option = document.querySelector(`[data-dropdown-option="${tagOption}"]`);
+    if (!$option) return;
+    $option.style.display = 'block';
 
-    handleTagRemoved(tagOption) {
-      this._selectedOptions = this._selectedOptions.filter((selectedOption) => selectedOption !== tagOption);
+    this.renderTagsAndCards();
+  }
 
-      const $optionClicked = document.querySelector(`[data-dropdown-option-clicked="${tagOption}"]`);
-      if (!$optionClicked) return;
-      $optionClicked.remove();
+  // handle search event
+  handleSearch() {
+    this.$dropdownListSearch.addEventListener('input', () => {
+      const searchValue = this.$dropdownListSearch.value.toLowerCase().trim();
 
-      const $option = document.querySelector(`[data-dropdown-option="${tagOption}"]`);
-      if (!$option) return;
-      $option.style.display = 'block';
-
-      this.renderTagsAndCards();
-    }
-
-    // handle search event
-    handleSearch() {
-      this.$dropdownListSearch.addEventListener('input', () => {
-        const searchValue = this.$dropdownListSearch.value.toLowerCase().trim();
-
-        this.$dropdownList.querySelectorAll('li').forEach((option) => {
-          if (option.innerText.toLowerCase().trim().includes(searchValue)) {
-            option.classList.remove('hidden');
-          } else {
-            option.classList.add('hidden');
-          }
-        });
-      });
-    }
-
-    // handle clear search event
-    handleClearSearch() {
-      this.$dropdownListSearchCloseIcon.addEventListener('click', () => {
-        this.$dropdownListSearch.value = '';
-        this.$dropdownList.querySelectorAll('li').forEach((option) => {
+      this.$dropdownList.querySelectorAll('li').forEach((option) => {
+        if (option.innerText.toLowerCase().trim().includes(searchValue)) {
           option.classList.remove('hidden');
-        });
+        } else {
+          option.classList.add('hidden');
+        }
       });
-    }
+    });
+  }
+
+  // handle clear search event
+  handleClearSearch() {
+    this.$dropdownListSearchCloseIcon.addEventListener('click', () => {
+      this.$dropdownListSearch.value = '';
+      this.$dropdownList.querySelectorAll('li').forEach((option) => {
+        option.classList.remove('hidden');
+      });
+    });
+  }
 
   async renderTagsAndCards(optionClicked) {
-      if (this._selectedOptions.length === 0) {
-        this.filteredRecipes = this._searchedRecipes;
-      } else {
-        this.filteredRecipes = await Query.getRecipesByTags(this._searchedRecipes, this._selectedOptions);
-      }
-
-      if (optionClicked) {
-        const $tags = renderTags(optionClicked.innerText);
-        $tags.$tagsClose.addEventListener('click', () => {
-          this.handleTagRemoved(optionClicked.innerText);
-          $tags.closeTags($tags.$tags);
-        });
-      }
-
-      renderCardsAndTotal(this.filteredRecipes, this.$cardsContainer);
-      updateDropdowns(this.appInstance.dropdowns, this.filteredRecipes);
+    if (this._selectedOptions.length === 0) {
+      this.filteredRecipes = this._searchedRecipes;
+    } else {
+      this.filteredRecipes = await Query.getRecipesByTags(this._searchedRecipes, this._selectedOptions);
     }
+
+    if (optionClicked) {
+      const $tags = renderTags(optionClicked.innerText);
+      $tags.$tagsClose.addEventListener('click', () => {
+        this.handleTagRemoved(optionClicked.innerText);
+        $tags.closeTags($tags.$tags);
+      });
+    }
+
+    renderCardsAndTotal(this.filteredRecipes, this.$cardsContainer);
+    updateDropdowns(this.appInstance.dropdowns, this.filteredRecipes);
   }
+}
