@@ -5,8 +5,8 @@ export const searchBar = (recipes, searchValue, $searchButton, cardsContainer) =
   $searchButton.classList.remove("bg-black");
   $searchButton.classList.add("bg-[#FFD15B]");
 
-  let i = 0;
-  while (i < recipes.length) {
+  let exitWhile = 0;
+  while (exitWhile < recipes.length) {
     const recipe = recipes[i];
     const recipeFields = {
       name: recipe.name.toLowerCase(),
@@ -20,12 +20,18 @@ export const searchBar = (recipes, searchValue, $searchButton, cardsContainer) =
 
     const isRecipeName = recipeFields.name.includes(searchValue);
     const isRecipeDescription = recipeFields.description.includes(searchValue);
-    const isRecipeIngredient = recipeFields.ingredients.some(ingredient => ingredient.includes(searchValue));
+    let isRecipeIngredient = false;
+
+    for (let i = 0; i < recipeFields.ingredientsList.length; i++) {
+      if (recipeFields.ingredientsList[i].includes(searchValue)) {
+        isRecipeIngredient = true;
+      };
+    }
 
     if (isRecipeName || isRecipeDescription || isRecipeIngredient) {
       results.push(recipe);
     }
-    i++;
+    exitWhile++;
   }
 
   console.log(results);
